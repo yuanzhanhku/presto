@@ -171,7 +171,8 @@ public class TestFeaturesConfig
                 .setPartialResultsEnabled(false)
                 .setPartialResultsCompletionRatioThreshold(0.5)
                 .setOffsetClauseEnabled(false)
-                .setPartialResultsMaxExecutionTimeMultiplier(2.0));
+                .setPartialResultsMaxExecutionTimeMultiplier(2.0)
+                .setAggregationIfToFilterRewriteEnabled(true));
     }
 
     @Test
@@ -295,6 +296,7 @@ public class TestFeaturesConfig
                 .put("partial-results-completion-ratio-threshold", "0.9")
                 .put("partial-results-max-execution-time-multiplier", "1.5")
                 .put("offset-clause-enabled", "true")
+                .put("optimizer.aggregation-if-to-filter-rewrite-enabled", "false")
                 .build();
 
         FeaturesConfig expected = new FeaturesConfig()
@@ -415,7 +417,8 @@ public class TestFeaturesConfig
                 .setPartialResultsEnabled(true)
                 .setPartialResultsCompletionRatioThreshold(0.9)
                 .setOffsetClauseEnabled(true)
-                .setPartialResultsMaxExecutionTimeMultiplier(1.5);
+                .setPartialResultsMaxExecutionTimeMultiplier(1.5)
+                .setAggregationIfToFilterRewriteEnabled(false);
         assertFullMapping(properties, expected);
     }
 

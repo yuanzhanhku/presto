@@ -195,6 +195,7 @@ public final class SystemSessionProperties
     public static final String PARTIAL_RESULTS_COMPLETION_RATIO_THRESHOLD = "partial_results_completion_ratio_threshold";
     public static final String PARTIAL_RESULTS_MAX_EXECUTION_TIME_MULTIPLIER = "partial_results_max_execution_time_multiplier";
     public static final String OFFSET_CLAUSE_ENABLED = "offset_clause_enabled";
+    public static final String AGGREGATION_IF_TO_FILTER_REWRITE_ENABLED = "aggregation_if_to_filter_rewrite_enabled";
 
     private final List<PropertyMetadata<?>> sessionProperties;
 
@@ -731,8 +732,8 @@ public final class SystemSessionProperties
                         PARTIAL_AGGREGATION_STRATEGY,
                         format("Partial aggregation strategy to use. Options are %s",
                                 Stream.of(PartialAggregationStrategy.values())
-                                .map(PartialAggregationStrategy::name)
-                                .collect(joining(","))),
+                                        .map(PartialAggregationStrategy::name)
+                                        .collect(joining(","))),
                         VARCHAR,
                         PartialAggregationStrategy.class,
                         featuresConfig.getPartialAggregationStrategy(),
@@ -1042,6 +1043,11 @@ public final class SystemSessionProperties
                         PARTIAL_RESULTS_MAX_EXECUTION_TIME_MULTIPLIER,
                         "This value is multiplied by the time taken to reach the completion ratio threshold and is set as max task end time",
                         featuresConfig.getPartialResultsMaxExecutionTimeMultiplier(),
+                        false),
+                booleanProperty(
+                        AGGREGATION_IF_TO_FILTER_REWRITE_ENABLED,
+                        "Enable rewriting the IF expression inside an aggregation function to a filter clause outside the aggregation",
+                        featuresConfig.isAggregationIfToFilterRewriteEnabled(),
                         false));
     }
 
@@ -1756,5 +1762,10 @@ public final class SystemSessionProperties
     public static boolean isOffsetClauseEnabled(Session session)
     {
         return session.getSystemProperty(OFFSET_CLAUSE_ENABLED, Boolean.class);
+    }
+
+    public static boolean isAggregationIfToFilterRewriteEnabled(Session session)
+    {
+        return session.getSystemProperty(AGGREGATION_IF_TO_FILTER_REWRITE_ENABLED, Boolean.class);
     }
 }

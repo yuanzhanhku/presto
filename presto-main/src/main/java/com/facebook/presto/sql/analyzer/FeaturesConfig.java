@@ -200,6 +200,8 @@ public class FeaturesConfig
 
     private boolean offsetClauseEnabled;
 
+    private boolean aggregationIfToFilterRewriteEnabled = true;
+
     public enum PartitioningPrecisionStrategy
     {
         // Let Presto decide when to repartition
@@ -1741,6 +1743,19 @@ public class FeaturesConfig
     public FeaturesConfig setOffsetClauseEnabled(boolean offsetClauseEnabled)
     {
         this.offsetClauseEnabled = offsetClauseEnabled;
+        return this;
+    }
+
+    public boolean isAggregationIfToFilterRewriteEnabled()
+    {
+        return aggregationIfToFilterRewriteEnabled;
+    }
+
+    @Config("optimizer.aggregation-if-to-filter-rewrite-enabled")
+    @ConfigDescription("Enable rewriting the IF expression inside an aggregation function to a filter clause outside the aggregation")
+    public FeaturesConfig setAggregationIfToFilterRewriteEnabled(boolean value)
+    {
+        this.aggregationIfToFilterRewriteEnabled = value;
         return this;
     }
 }
