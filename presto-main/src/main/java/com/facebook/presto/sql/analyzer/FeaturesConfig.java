@@ -200,7 +200,7 @@ public class FeaturesConfig
 
     private boolean offsetClauseEnabled;
 
-    private boolean aggregationIfToFilterRewriteEnabled = true;
+    private boolean aggregationIfToFilterRewriteEnabled;
 
     public enum PartitioningPrecisionStrategy
     {
