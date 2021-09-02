@@ -200,7 +200,7 @@ public class FeaturesConfig
 
     private boolean offsetClauseEnabled;
 
-    private boolean aggregationIfToFilterRewriteEnabled;
+    private AggregationIfToFilterRewriteStrategy aggregationIfToFilterRewriteStrategy = AggregationIfToFilterRewriteStrategy.DISABLED;
 
     public enum PartitioningPrecisionStrategy
     {
@@ -275,6 +275,13 @@ public class FeaturesConfig
         ALWAYS, // Always do partial aggregation
         NEVER, // Never do partial aggregation
         AUTOMATIC // Let the optimizer decide for each aggregation
+    }
+
+    public enum AggregationIfToFilterRewriteStrategy
+    {
+        DISABLED,
+        FILTER_WITH_IF, // Rewrites AGG(IF(condition, expr)) to AGG(IF(condition, expr)) FILTER (WHERE condition).
+        UNWRAP_IF // Rewrites AGG(IF(condition, expr)) to AGG(expr) FILTER (WHERE condition).
     }
 
     public double getCpuCostWeight()
@@ -1746,16 +1753,16 @@ public class FeaturesConfig
         return this;
     }
 
-    public boolean isAggregationIfToFilterRewriteEnabled()
+    public AggregationIfToFilterRewriteStrategy getAggregationIfToFilterRewriteStrategy()
     {
-        return aggregationIfToFilterRewriteEnabled;
+        return aggregationIfToFilterRewriteStrategy;
     }
 
-    @Config("optimizer.aggregation-if-to-filter-rewrite-enabled")
-    @ConfigDescription("Enable rewriting the IF expression inside an aggregation function to a filter clause outside the aggregation")
-    public FeaturesConfig setAggregationIfToFilterRewriteEnabled(boolean value)
+    @Config("optimizer.aggregation-if-to-filter-rewrite-strategy")
+    @ConfigDescription("Set the strategy used to rewrite AGG IF to AGG FILTER")
+    public FeaturesConfig setAggregationIfToFilterRewriteStrategy(AggregationIfToFilterRewriteStrategy strategy)
     {
-        this.aggregationIfToFilterRewriteEnabled = value;
+        this.aggregationIfToFilterRewriteStrategy = strategy;
         return this;
     }
 }

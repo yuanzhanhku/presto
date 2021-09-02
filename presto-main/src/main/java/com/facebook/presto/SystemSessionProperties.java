@@ -25,6 +25,7 @@ import com.facebook.presto.spi.PrestoException;
 import com.facebook.presto.spi.session.PropertyMetadata;
 import com.facebook.presto.spiller.NodeSpillConfig;
 import com.facebook.presto.sql.analyzer.FeaturesConfig;
+import com.facebook.presto.sql.analyzer.FeaturesConfig.AggregationIfToFilterRewriteStrategy;
 import com.facebook.presto.sql.analyzer.FeaturesConfig.AggregationPartitioningMergingStrategy;
 import com.facebook.presto.sql.analyzer.FeaturesConfig.JoinDistributionType;
 import com.facebook.presto.sql.analyzer.FeaturesConfig.JoinReorderingStrategy;
@@ -195,7 +196,7 @@ public final class SystemSessionProperties
     public static final String PARTIAL_RESULTS_COMPLETION_RATIO_THRESHOLD = "partial_results_completion_ratio_threshold";
     public static final String PARTIAL_RESULTS_MAX_EXECUTION_TIME_MULTIPLIER = "partial_results_max_execution_time_multiplier";
     public static final String OFFSET_CLAUSE_ENABLED = "offset_clause_enabled";
-    public static final String AGGREGATION_IF_TO_FILTER_REWRITE_ENABLED = "aggregation_if_to_filter_rewrite_enabled";
+    public static final String AGGREGATION_IF_TO_FILTER_REWRITE_STRATEGY = "aggregation_if_to_filter_rewrite_strategy";
 
     private final List<PropertyMetadata<?>> sessionProperties;
 
@@ -1044,11 +1045,18 @@ public final class SystemSessionProperties
                         "This value is multiplied by the time taken to reach the completion ratio threshold and is set as max task end time",
                         featuresConfig.getPartialResultsMaxExecutionTimeMultiplier(),
                         false),
-                booleanProperty(
-                        AGGREGATION_IF_TO_FILTER_REWRITE_ENABLED,
-                        "Enable rewriting the IF expression inside an aggregation function to a filter clause outside the aggregation",
-                        featuresConfig.isAggregationIfToFilterRewriteEnabled(),
-                        false));
+                new PropertyMetadata<>(
+                        AGGREGATION_IF_TO_FILTER_REWRITE_STRATEGY,
+                        format("Set the strategy used to rewrite AGG IF to AGG FILTER. Options are %s",
+                                Stream.of(AggregationIfToFilterRewriteStrategy.values())
+                                        .map(AggregationIfToFilterRewriteStrategy::name)
+                                        .collect(joining(","))),
+                        VARCHAR,
+                        AggregationIfToFilterRewriteStrategy.class,
+                        featuresConfig.getAggregationIfToFilterRewriteStrategy(),
+                        false,
+                        value -> AggregationIfToFilterRewriteStrategy.valueOf(((String) value).toUpperCase()),
+                        AggregationIfToFilterRewriteStrategy::name));
     }
 
     public static boolean isEmptyJoinOptimization(Session session)
@@ -1764,8 +1772,8 @@ public final class SystemSessionProperties
         return session.getSystemProperty(OFFSET_CLAUSE_ENABLED, Boolean.class);
     }
 
-    public static boolean isAggregationIfToFilterRewriteEnabled(Session session)
+    public static AggregationIfToFilterRewriteStrategy getAggregationIfToFilterRewriteStrategy(Session session)
     {
-        return session.getSystemProperty(AGGREGATION_IF_TO_FILTER_REWRITE_ENABLED, Boolean.class);
+        return session.getSystemProperty(AGGREGATION_IF_TO_FILTER_REWRITE_STRATEGY, AggregationIfToFilterRewriteStrategy.class);
     }
 }
