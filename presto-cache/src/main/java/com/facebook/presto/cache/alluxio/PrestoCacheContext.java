@@ -50,7 +50,6 @@ public class PrestoCacheContext
     @Override
     public void incrementCounter(String name, long value)
     {
-        hiveFileContext.incrementCounter(name, value);
     }
 
     public HiveFileContext getHiveFileContext()
