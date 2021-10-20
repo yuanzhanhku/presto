@@ -13,7 +13,6 @@
  */
 package com.facebook.presto.orc;
 
-import com.facebook.presto.common.RuntimeStats;
 import com.facebook.presto.orc.checkpoint.InvalidCheckpointException;
 import com.facebook.presto.orc.checkpoint.StreamCheckpoint;
 import com.facebook.presto.orc.metadata.ColumnEncoding;
@@ -97,7 +96,6 @@ public class StripeReader
     private final StripeMetadataSource stripeMetadataSource;
     private final boolean cacheable;
     private final Multimap<Integer, Integer> dwrfEncryptionGroupColumns;
-    private final RuntimeStats runtimeStats;
 
     public StripeReader(
             OrcDataSource orcDataSource,
@@ -111,8 +109,7 @@ public class StripeReader
             Optional<OrcWriteValidation> writeValidation,
             StripeMetadataSource stripeMetadataSource,
             boolean cacheable,
-            Map<Integer, Integer> dwrfEncryptionGroupMap,
-            RuntimeStats runtimeStats)
+            Map<Integer, Integer> dwrfEncryptionGroupMap)
     {
         this.orcDataSource = requireNonNull(orcDataSource, "orcDataSource is null");
         this.decompressor = requireNonNull(decompressor, "decompressor is null");
@@ -124,9 +121,8 @@ public class StripeReader
         this.metadataReader = requireNonNull(metadataReader, "metadataReader is null");
         this.writeValidation = requireNonNull(writeValidation, "writeValidation is null");
         this.stripeMetadataSource = requireNonNull(stripeMetadataSource, "stripeMetadataSource is null");
-        this.cacheable = cacheable;
+        this.cacheable = requireNonNull(cacheable, "hiveFileContext is null");
         this.dwrfEncryptionGroupColumns = invertEncryptionGroupMap(requireNonNull(dwrfEncryptionGroupMap, "dwrfEncryptionGroupMap is null"));
-        this.runtimeStats = requireNonNull(runtimeStats, "runtimeStats is null");
     }
 
     private Multimap<Integer, Integer> invertEncryptionGroupMap(Map<Integer, Integer> dwrfEncryptionGroupMap)

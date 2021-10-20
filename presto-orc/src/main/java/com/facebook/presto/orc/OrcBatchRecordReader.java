@@ -14,7 +14,6 @@
 package com.facebook.presto.orc;
 
 import com.facebook.presto.common.Page;
-import com.facebook.presto.common.RuntimeStats;
 import com.facebook.presto.common.block.Block;
 import com.facebook.presto.common.type.Type;
 import com.facebook.presto.orc.metadata.MetadataReader;
@@ -65,8 +64,7 @@ public class OrcBatchRecordReader
             Optional<OrcWriteValidation> writeValidation,
             int initialBatchSize,
             StripeMetadataSource stripeMetadataSource,
-            boolean cacheable,
-            RuntimeStats runtimeStats)
+            boolean cacheable)
             throws OrcCorruptionException
 
     {
@@ -103,8 +101,7 @@ public class OrcBatchRecordReader
                 writeValidation,
                 initialBatchSize,
                 stripeMetadataSource,
-                cacheable,
-                runtimeStats);
+                cacheable);
     }
 
     public int nextBatch()
