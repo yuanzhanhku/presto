@@ -13,7 +13,6 @@
  */
 package com.facebook.presto.orc;
 
-import com.facebook.presto.common.RuntimeStats;
 import com.facebook.presto.common.block.Block;
 import com.facebook.presto.orc.cache.StorageOrcFileTailSource;
 import com.facebook.presto.orc.metadata.CompressionKind;
@@ -310,8 +309,7 @@ public class TestOrcReaderPositions
                     OrcReaderTestingUtils.createDefaultTestConfig(),
                     false,
                     NO_ENCRYPTION,
-                    DwrfKeyProvider.EMPTY,
-                    new RuntimeStats());
+                    DwrfKeyProvider.EMPTY);
             Footer footer = orcReader.getFooter();
             Map<String, String> readMetadata = Maps.transformValues(footer.getUserMetadata(), Slice::toStringAscii);
             assertEquals(readMetadata, metadata);

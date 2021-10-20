@@ -13,7 +13,6 @@
  */
 package com.facebook.presto.orc;
 
-import com.facebook.presto.common.RuntimeStats;
 import com.facebook.presto.common.block.Block;
 import com.facebook.presto.orc.OrcTester.Format;
 import com.facebook.presto.orc.cache.StorageOrcFileTailSource;
@@ -244,8 +243,7 @@ public class TestCachingOrcDataSource
                 new OrcReaderOptions(maxMergeDistance, tinyStripeThreshold, new DataSize(1, Unit.MEGABYTE), false),
                 false,
                 NO_ENCRYPTION,
-                DwrfKeyProvider.EMPTY,
-                new RuntimeStats());
+                DwrfKeyProvider.EMPTY);
         // 1 for reading file footer
         assertEquals(orcDataSource.getReadCount(), 1);
         List<StripeInformation> stripes = orcReader.getFooter().getStripes();

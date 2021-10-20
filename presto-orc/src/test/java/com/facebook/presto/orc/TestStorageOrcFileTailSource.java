@@ -13,7 +13,6 @@
  */
 package com.facebook.presto.orc;
 
-import com.facebook.presto.common.RuntimeStats;
 import com.facebook.presto.orc.cache.StorageOrcFileTailSource;
 import com.facebook.presto.orc.metadata.DwrfMetadataReader;
 import com.facebook.presto.orc.metadata.DwrfStripeCacheData;
@@ -56,7 +55,7 @@ public class TestStorageOrcFileTailSource
             throws Exception
     {
         this.file = new TempFile();
-        this.metadataReader = new DwrfMetadataReader(new RuntimeStats());
+        this.metadataReader = new DwrfMetadataReader();
     }
 
     @AfterMethod(alwaysRun = true)

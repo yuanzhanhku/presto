@@ -455,7 +455,6 @@ public class IcebergPageSourceProvider
 
             // Todo: pass real columns to ProjectionBasedDwrfKeyProvider instead of ImmutableList.of()
             DwrfKeyProvider dwrfKeyProvider = new ProjectionBasedDwrfKeyProvider(encryptionInformation, ImmutableList.of(), true, path);
-            RuntimeStats runtimeStats = new RuntimeStats();
             OrcReader reader = new OrcReader(
                     orcDataSource,
                     orcEncoding,
@@ -465,8 +464,7 @@ public class IcebergPageSourceProvider
                     options,
                     isCacheable,
                     dwrfEncryptionProvider,
-                    dwrfKeyProvider,
-                    runtimeStats);
+                    dwrfKeyProvider);
 
             List<HiveColumnHandle> physicalColumnHandles = new ArrayList<>(regularColumns.size());
             ImmutableMap.Builder<Integer, Type> includedColumns = ImmutableMap.builder();
@@ -574,7 +572,7 @@ public class IcebergPageSourceProvider
                     typeManager,
                     systemMemoryUsage,
                     stats,
-                    runtimeStats);
+                    new RuntimeStats());
         }
         catch (Exception e) {
             if (orcDataSource != null) {

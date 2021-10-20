@@ -13,7 +13,6 @@
  */
 package com.facebook.presto.orc;
 
-import com.facebook.presto.common.RuntimeStats;
 import com.facebook.presto.common.predicate.Domain;
 import com.facebook.presto.common.predicate.TupleDomain;
 import com.facebook.presto.common.type.Type;
@@ -122,7 +121,7 @@ public class TestOrcBloomFilters
 
         // Read through method
         InputStream inputStream = new ByteArrayInputStream(bytes);
-        OrcMetadataReader metadataReader = new OrcMetadataReader(new RuntimeStats());
+        OrcMetadataReader metadataReader = new OrcMetadataReader();
         List<HiveBloomFilter> bloomFilters = metadataReader.readBloomFilterIndexes(inputStream);
 
         assertEquals(bloomFilters.size(), 1);

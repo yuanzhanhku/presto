@@ -13,7 +13,6 @@
  */
 package com.facebook.presto.orc;
 
-import com.facebook.presto.common.RuntimeStats;
 import com.facebook.presto.common.Subfield;
 import com.facebook.presto.common.block.Block;
 import com.facebook.presto.common.type.Type;
@@ -80,8 +79,6 @@ public class OrcReader
 
     private final boolean cacheable;
 
-    private final RuntimeStats runtimeStats;
-
     // This is based on the Apache Hive ORC code
     public OrcReader(
             OrcDataSource orcDataSource,
@@ -92,8 +89,7 @@ public class OrcReader
             OrcReaderOptions orcReaderOptions,
             boolean cacheable,
             DwrfEncryptionProvider dwrfEncryptionProvider,
-            DwrfKeyProvider dwrfKeyProvider,
-            RuntimeStats runtimeStats)
+            DwrfKeyProvider dwrfKeyProvider)
             throws IOException
     {
         this(
@@ -106,8 +102,7 @@ public class OrcReader
                 orcReaderOptions,
                 cacheable,
                 dwrfEncryptionProvider,
-                dwrfKeyProvider,
-                runtimeStats);
+                dwrfKeyProvider);
     }
 
     public OrcReader(
@@ -119,8 +114,7 @@ public class OrcReader
             OrcReaderOptions orcReaderOptions,
             boolean cacheable,
             DwrfEncryptionProvider dwrfEncryptionProvider,
-            DwrfKeyProvider dwrfKeyProvider,
-            RuntimeStats runtimeStats)
+            DwrfKeyProvider dwrfKeyProvider)
             throws IOException
     {
         this(
@@ -133,8 +127,7 @@ public class OrcReader
                 orcReaderOptions,
                 cacheable,
                 dwrfEncryptionProvider,
-                dwrfKeyProvider,
-                runtimeStats);
+                dwrfKeyProvider);
     }
 
     OrcReader(
@@ -147,16 +140,14 @@ public class OrcReader
             OrcReaderOptions orcReaderOptions,
             boolean cacheable,
             DwrfEncryptionProvider dwrfEncryptionProvider,
-            DwrfKeyProvider dwrfKeyProvider,
-            RuntimeStats runtimeStats)
+            DwrfKeyProvider dwrfKeyProvider)
             throws IOException
     {
         this.orcReaderOptions = requireNonNull(orcReaderOptions, "orcReaderOptions is null");
         orcDataSource = wrapWithCacheIfTiny(orcDataSource, orcReaderOptions.getTinyStripeThreshold(), aggregatedMemoryContext);
         this.orcDataSource = orcDataSource;
         requireNonNull(orcEncoding, "orcEncoding is null");
-        this.runtimeStats = requireNonNull(runtimeStats, "runtimeStats is null");
-        this.metadataReader = new ExceptionWrappingMetadataReader(orcDataSource.getId(), orcEncoding.createMetadataReader(runtimeStats));
+        this.metadataReader = new ExceptionWrappingMetadataReader(orcDataSource.getId(), orcEncoding.createMetadataReader());
 
         this.writeValidation = requireNonNull(writeValidation, "writeValidation is null");
 
@@ -219,7 +210,7 @@ public class OrcReader
             writeValidation.get().validateStripeStatistics(orcDataSource.getId(), footer.getStripes(), metadata.getStripeStatsList());
         }
 
-        this.cacheable = requireNonNull(cacheable, "cacheable is null");
+        this.cacheable = requireNonNull(cacheable, "hiveFileContext is null");
 
         Optional<DwrfStripeCache> dwrfStripeCache = Optional.empty();
         if (orcFileTail.getDwrfStripeCacheData().isPresent() && footer.getDwrfStripeCacheOffsets().isPresent()) {
@@ -428,8 +419,7 @@ public class OrcReader
                     orcReaderOptions,
                     false,
                     dwrfEncryptionProvider,
-                    dwrfKeyProvider,
-                    new RuntimeStats());
+                    dwrfKeyProvider);
             try (OrcBatchRecordReader orcRecordReader = orcReader.createBatchRecordReader(
                     readTypes.build(),
                     OrcPredicate.TRUE,

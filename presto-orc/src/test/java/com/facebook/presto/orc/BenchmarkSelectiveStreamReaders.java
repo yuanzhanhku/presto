@@ -14,7 +14,6 @@
 package com.facebook.presto.orc;
 
 import com.facebook.presto.common.Page;
-import com.facebook.presto.common.RuntimeStats;
 import com.facebook.presto.common.Subfield;
 import com.facebook.presto.common.block.Block;
 import com.facebook.presto.common.type.DecimalType;
@@ -290,8 +289,7 @@ public class BenchmarkSelectiveStreamReaders
                     OrcReaderTestingUtils.createDefaultTestConfig(),
                     false,
                     NO_ENCRYPTION,
-                    DwrfKeyProvider.EMPTY,
-                    new RuntimeStats());
+                    DwrfKeyProvider.EMPTY);
 
             return orcReader.createSelectiveRecordReader(
                     IntStream.range(0, channelCount).boxed().collect(Collectors.toMap(Function.identity(), i -> type)),

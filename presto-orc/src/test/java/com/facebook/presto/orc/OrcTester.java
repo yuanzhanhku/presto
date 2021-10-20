@@ -15,7 +15,6 @@ package com.facebook.presto.orc;
 
 import com.facebook.hive.orc.lazy.OrcLazyObject;
 import com.facebook.presto.common.Page;
-import com.facebook.presto.common.RuntimeStats;
 import com.facebook.presto.common.Subfield;
 import com.facebook.presto.common.block.Block;
 import com.facebook.presto.common.block.BlockBuilder;
@@ -1470,8 +1469,7 @@ public class OrcTester
                         false),
                 cacheable,
                 new DwrfEncryptionProvider(new UnsupportedEncryptionLibrary(), new TestingEncryptionLibrary()),
-                DwrfKeyProvider.of(intermediateEncryptionKeys),
-                new RuntimeStats());
+                DwrfKeyProvider.of(intermediateEncryptionKeys));
 
         assertEquals(orcReader.getFooter().getRowsInRowGroup(), 10_000);
 
@@ -1505,8 +1503,7 @@ public class OrcTester
                         false),
                 false,
                 new DwrfEncryptionProvider(new UnsupportedEncryptionLibrary(), new TestingEncryptionLibrary()),
-                DwrfKeyProvider.of(intermediateEncryptionKeys),
-                new RuntimeStats());
+                DwrfKeyProvider.of(intermediateEncryptionKeys));
         return orcReader;
     }
 
@@ -1552,7 +1549,6 @@ public class OrcTester
         boolean zstdJniDecompressionEnabled = true;
         DataSize dataSize = new DataSize(1, MEGABYTE);
         OrcDataSource orcDataSource = new FileOrcDataSource(inputFile, dataSize, dataSize, dataSize, true);
-        RuntimeStats runtimeStats = new RuntimeStats();
         OrcReader reader = new OrcReader(
                 orcDataSource,
                 encoding,
@@ -1566,8 +1562,7 @@ public class OrcTester
                         zstdJniDecompressionEnabled),
                 false,
                 NO_ENCRYPTION,
-                DwrfKeyProvider.EMPTY,
-                runtimeStats);
+                DwrfKeyProvider.EMPTY);
 
         Footer footer = reader.getFooter();
         Optional<OrcDecompressor> decompressor = createOrcDecompressor(orcDataSource.getId(), reader.getCompressionKind(), reader.getBufferSize(), zstdJniDecompressionEnabled);
@@ -1585,7 +1580,7 @@ public class OrcTester
                     Optional.empty(),
                     new TestingHiveOrcAggregatedMemoryContext(),
                     tailBuffer.length)) {
-                StripeFooter stripeFooter = encoding.createMetadataReader(runtimeStats).readStripeFooter(orcDataSource.getId(), footer.getTypes(), inputStream);
+                StripeFooter stripeFooter = encoding.createMetadataReader().readStripeFooter(orcDataSource.getId(), footer.getTypes(), inputStream);
                 stripes.add(stripeFooter);
             }
         }
@@ -1689,8 +1684,7 @@ public class OrcTester
                         false),
                 false,
                 new DwrfEncryptionProvider(new UnsupportedEncryptionLibrary(), new TestingEncryptionLibrary()),
-                DwrfKeyProvider.of(intermediateEncryptionKeys),
-                new RuntimeStats());
+                DwrfKeyProvider.of(intermediateEncryptionKeys));
 
         assertEquals(orcReader.getColumnNames().subList(0, types.size()), makeColumnNames(types.size()));
 

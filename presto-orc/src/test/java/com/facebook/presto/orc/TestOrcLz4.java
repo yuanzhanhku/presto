@@ -13,7 +13,6 @@
  */
 package com.facebook.presto.orc;
 
-import com.facebook.presto.common.RuntimeStats;
 import com.facebook.presto.common.block.Block;
 import com.facebook.presto.common.type.Type;
 import com.facebook.presto.orc.cache.StorageOrcFileTailSource;
@@ -62,8 +61,7 @@ public class TestOrcLz4
                         false),
                 false,
                 NO_ENCRYPTION,
-                DwrfKeyProvider.EMPTY,
-                new RuntimeStats());
+                DwrfKeyProvider.EMPTY);
 
         assertEquals(orcReader.getCompressionKind(), LZ4);
         assertEquals(orcReader.getFooter().getNumberOfRows(), 10_000);

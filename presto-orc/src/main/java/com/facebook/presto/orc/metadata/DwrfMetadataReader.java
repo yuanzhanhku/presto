@@ -13,7 +13,6 @@
  */
 package com.facebook.presto.orc.metadata;
 
-import com.facebook.presto.common.RuntimeStats;
 import com.facebook.presto.orc.DwrfDataEncryptor;
 import com.facebook.presto.orc.DwrfEncryptionProvider;
 import com.facebook.presto.orc.DwrfKeyProvider;
@@ -43,13 +42,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Iterables;
-import com.sun.management.ThreadMXBean;
 import io.airlift.slice.BasicSliceInput;
 import io.airlift.slice.Slice;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -85,20 +82,10 @@ import static java.util.Objects.requireNonNull;
 public class DwrfMetadataReader
         implements MetadataReader
 {
-    private static final ThreadMXBean THREAD_MX_BEAN = (ThreadMXBean) ManagementFactory.getThreadMXBean();
-
-    private final RuntimeStats runtimeStats;
-
-    public DwrfMetadataReader(RuntimeStats runtimeStats)
-    {
-        this.runtimeStats = requireNonNull(runtimeStats, "runtimeStats is null");
-    }
-
     @Override
     public PostScript readPostScript(byte[] data, int offset, int length)
             throws IOException
     {
-        long cpuStart = THREAD_MX_BEAN.getCurrentThreadCpuTime();
         CodedInputStream input = CodedInputStream.newInstance(data, offset, length);
         DwrfProto.PostScript postScript = DwrfProto.PostScript.parseFrom(input);
 
@@ -110,7 +97,6 @@ public class DwrfMetadataReader
             stripeCacheLength = OptionalInt.of(postScript.getCacheSize());
             stripeCacheMode = Optional.of(toStripeCacheMode(postScript.getCacheMode()));
         }
-        runtimeStats.addMetricValue("DwrfReadPostScriptTimeNanos", THREAD_MX_BEAN.getCurrentThreadCpuTime() - cpuStart);
 
         return new PostScript(
                 ImmutableList.of(),
@@ -138,7 +124,6 @@ public class DwrfMetadataReader
             Optional<OrcDecompressor> decompressor)
             throws IOException
     {
-        long cpuStart = THREAD_MX_BEAN.getCurrentThreadCpuTime();
         CodedInputStream input = CodedInputStream.newInstance(inputStream);
         DwrfProto.Footer footer = DwrfProto.Footer.parseFrom(input);
         List<ColumnStatistics> fileStats = toColumnStatistics(hiveWriterVersion, footer.getStatisticsList(), false);
@@ -152,7 +137,6 @@ public class DwrfMetadataReader
             EncryptionLibrary encryptionLibrary = dwrfEncryptionProvider.getEncryptionLibrary(encryption.get().getKeyProvider());
             fileStats = decryptAndCombineFileStatistics(hiveWriterVersion, encryption.get(), encryptionLibrary, fileStats, fileStripes, keys, orcDataSource, decompressor);
         }
-        runtimeStats.addMetricValue("DwrfReadFooterTimeNanos", THREAD_MX_BEAN.getCurrentThreadCpuTime() - cpuStart);
 
         OptionalLong rawSize = footer.hasRawDataSize() ? OptionalLong.of(footer.getRawDataSize()) : OptionalLong.empty();
         return new Footer(
@@ -319,10 +303,8 @@ public class DwrfMetadataReader
     public StripeFooter readStripeFooter(OrcDataSourceId orcDataSourceId, List<OrcType> types, InputStream inputStream)
             throws IOException
     {
-        long cpuStart = THREAD_MX_BEAN.getCurrentThreadCpuTime();
         CodedInputStream input = CodedInputStream.newInstance(inputStream);
         DwrfProto.StripeFooter stripeFooter = DwrfProto.StripeFooter.parseFrom(input);
-        runtimeStats.addMetricValue("DwrfReadStripeFooterTimeNanos", THREAD_MX_BEAN.getCurrentThreadCpuTime() - cpuStart);
         return new StripeFooter(
                 toStream(orcDataSourceId, stripeFooter.getStreamsList()),
                 toColumnEncoding(types, stripeFooter.getColumnsList()),
@@ -425,10 +407,8 @@ public class DwrfMetadataReader
     public List<RowGroupIndex> readRowIndexes(HiveWriterVersion hiveWriterVersion, InputStream inputStream)
             throws IOException
     {
-        long cpuStart = THREAD_MX_BEAN.getCurrentThreadCpuTime();
         CodedInputStream input = CodedInputStream.newInstance(inputStream);
         DwrfProto.RowIndex rowIndex = DwrfProto.RowIndex.parseFrom(input);
-        runtimeStats.addMetricValue("DwrfReadRowIndexesTimeNanos", THREAD_MX_BEAN.getCurrentThreadCpuTime() - cpuStart);
         return ImmutableList.copyOf(Iterables.transform(rowIndex.getEntryList(), rowIndexEntry -> toRowGroupIndex(hiveWriterVersion, rowIndexEntry)));
     }
 

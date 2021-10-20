@@ -15,7 +15,6 @@ package com.facebook.presto.raptor.storage;
 
 import com.facebook.airlift.json.JsonCodec;
 import com.facebook.presto.common.Page;
-import com.facebook.presto.common.RuntimeStats;
 import com.facebook.presto.common.block.Block;
 import com.facebook.presto.common.io.DataSink;
 import com.facebook.presto.common.predicate.TupleDomain;
@@ -299,8 +298,7 @@ public class OrcStorageManager
                     new OrcReaderOptions(readerAttributes.getMaxMergeDistance(), readerAttributes.getTinyStripeThreshold(), HUGE_MAX_READ_BLOCK_SIZE, readerAttributes.isZstdJniDecompressionEnabled()),
                     hiveFileContext.isCacheable(),
                     NO_ENCRYPTION,
-                    DwrfKeyProvider.EMPTY,
-                    new RuntimeStats());
+                    DwrfKeyProvider.EMPTY);
 
             Map<Long, Integer> indexMap = columnIdIndex(reader.getColumnNames());
             ImmutableMap.Builder<Integer, Type> includedColumns = ImmutableMap.builder();
@@ -395,8 +393,7 @@ public class OrcStorageManager
                             defaultReaderAttributes.isZstdJniDecompressionEnabled()),
                     false,
                     NO_ENCRYPTION,
-                    DwrfKeyProvider.EMPTY,
-                    new RuntimeStats());
+                    DwrfKeyProvider.EMPTY);
 
             if (reader.getFooter().getNumberOfRows() >= Integer.MAX_VALUE) {
                 throw new IOException("File has too many rows");
@@ -561,8 +558,7 @@ public class OrcStorageManager
                     new OrcReaderOptions(defaultReaderAttributes.getMaxMergeDistance(), defaultReaderAttributes.getTinyStripeThreshold(), HUGE_MAX_READ_BLOCK_SIZE, defaultReaderAttributes.isZstdJniDecompressionEnabled()),
                     false,
                     NO_ENCRYPTION,
-                    DwrfKeyProvider.EMPTY,
-                    new RuntimeStats());
+                    DwrfKeyProvider.EMPTY);
 
             ImmutableList.Builder<ColumnStats> list = ImmutableList.builder();
             for (ColumnInfo info : getColumnInfo(reader)) {
